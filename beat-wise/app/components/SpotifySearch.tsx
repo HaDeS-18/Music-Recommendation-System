@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { SearchResult } from "@/types/spotify";
 import { WelcomeHero } from "./WelcomeHero";
 import { Features } from "./Features";
@@ -52,6 +52,22 @@ export default function SpotifySearch() {
 
       const data = await res.json();
       setRecommendations(data.recommendations || []);
+
+      for(const songs in data.recommendations) {
+        const song = data.recommendations[songs].name + " " + data.recommendations[songs].artists
+
+        // Fetch the track details from Spotify
+        
+        const searchRes = await fetch(
+          `/api/spotify/search?q=${encodeURIComponent(song)}`
+        );
+        const searchData = await searchRes.json();
+        const track = searchData.tracks.items[0];
+        if (track) {
+          setSearchResults((prev) => [...prev, track]);
+          setSelectedTracks((prev) => new Set([...prev, track.id]));
+        }
+      }
     } catch (error) {
       console.error("Error fetching recommendations:", error);
     }
@@ -63,24 +79,6 @@ export default function SpotifySearch() {
   const handleReset = () => {
     setCustomSongs([""]);
     setRecommendations([]);
-  };
-
-  const handleSearch = async (query = searchQuery) => {
-    if (!session?.accessToken || !query) return;
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `/api/spotify/search?q=${encodeURIComponent(query)}`
-      );
-      if (!response.ok) throw new Error("Failed to search");
-      const data = await response.json();
-      setSearchResults(data.tracks.items);
-      setSelectedTracks(new Set());
-    } catch (error) {
-      console.error("Error searching:", error);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const toggleTrackSelection = (trackId: string) => {
@@ -100,7 +98,7 @@ export default function SpotifySearch() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           trackIds: Array.from(selectedTracks),
-          playlistName: playlistName || `My ${searchQuery} Playlist`,
+          playlistName: playlistName || `My Recommended Playlist`,
         }),
       });
       if (!response.ok) throw new Error("Failed to create playlist");
@@ -118,7 +116,7 @@ export default function SpotifySearch() {
   return (
     <div className="min-h-screen w-full bg-black text-white font-inter">
       {!session ? (
-        <div className="flex flex-col items-center justify-center pt-10 pb-24">
+        <div className="flex flex-col items-center justify-center pt-1 pb-24">
           <WelcomeHero />
           <button
             onClick={() => signIn("spotify")}
@@ -188,6 +186,8 @@ export default function SpotifySearch() {
             </div>
           </div>
 
+          {/* Search results from Spotify */}
+
           {searchResults.length > 0 && (
             <div className="mt-10">
               <div className="flex items-center justify-between mb-4">
@@ -214,6 +214,8 @@ export default function SpotifySearch() {
                 )}
               </div>
 
+              {/* Post Playlist creation */}
+
               {playlistResult && (
                 <div className="mb-4 p-4 bg-green-900 bg-opacity-20 border border-green-800 rounded-lg">
                   <p className="font-bold text-green-400">
@@ -235,6 +237,8 @@ export default function SpotifySearch() {
                   </button>
                 </div>
               )}
+
+              {/* Search results from Spotify mapped with artist name and photo */}
 
               <div className="space-y-4">
                 {searchResults.map((track) => (
@@ -274,6 +278,8 @@ export default function SpotifySearch() {
               </div>
             </div>
           )}
+
+          {/* Recommendation results from the Model */}
 
           {recommendations.length > 0 && (
             <div className="mt-10">

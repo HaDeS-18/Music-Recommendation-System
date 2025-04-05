@@ -1,3 +1,4 @@
+import NormalUISearch from "./components/normalUISearch";
 import SpotifySearch from "./components/SpotifySearch";
 
 export default function Home() {
