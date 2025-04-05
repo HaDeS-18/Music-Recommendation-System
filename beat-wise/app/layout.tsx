@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import './globals.css';
+import { Providers } from './providers';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: "Beat Wise",
@@ -8,15 +9,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body
-        className={`antialiased`}
-      >
-        {children}
+      <body className="bg-zinc-900 text-white min-h-screen">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
