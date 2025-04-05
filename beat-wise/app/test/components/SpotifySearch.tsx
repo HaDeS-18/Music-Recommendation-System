@@ -9,6 +9,10 @@ export default function SpotifySearch() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
+  const [playlistResult, setPlaylistResult] = useState<any>(null);
+  const [selectedTracks, setSelectedTracks] = useState<Set<string>>(new Set());
+  const [playlistName, setPlaylistName] = useState("");
 
   const handleSearch = async () => {
     if (!session?.accessToken || !searchQuery) return;
@@ -23,10 +27,53 @@ export default function SpotifySearch() {
       
       const data = await response.json();
       setSearchResults(data.tracks.items);
+      
+      setSelectedTracks(new Set());
     } catch (error) {
       console.error("Error searching:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const toggleTrackSelection = (trackId: string) => {
+    const newSelection = new Set(selectedTracks);
+    if (newSelection.has(trackId)) {
+      newSelection.delete(trackId);
+    } else {
+      newSelection.add(trackId);
+    }
+    setSelectedTracks(newSelection);
+  };
+
+  const createPlaylist = async () => {
+    if (selectedTracks.size === 0) return;
+    
+    setIsCreatingPlaylist(true);
+    try {
+      const response = await fetch('/api/spotify/create-playlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          trackIds: Array.from(selectedTracks),
+          playlistName: playlistName || `My ${searchQuery} Playlist`,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create playlist');
+      }
+      
+      const data = await response.json();
+      setPlaylistResult(data.playlist);
+      setSelectedTracks(new Set());
+      setPlaylistName("");
+    } catch (error) {
+      console.error("Error creating playlist:", error);
+    } finally {
+      setIsCreatingPlaylist(false);
     }
   };
   
@@ -64,29 +111,85 @@ export default function SpotifySearch() {
             </button>
           </div>
           
-          <div className="w-full space-y-4">
-            {searchResults.map((track) => (
-              <div 
-                key={track.id} 
-                className="bg-zinc-800 p-4 rounded-lg border border-zinc-700 hover:border-[#1DB954] transition duration-300"
-              >
-                <div className="flex items-center">
-                  {track.album.images[0] && (
-                    <img 
-                      src={track.album.images[0].url} 
-                      alt={track.album.name}
-                      className="w-16 h-16 rounded-md mr-4"
+          {searchResults.length > 0 && (
+            <div className="w-full mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Search Results</h2>
+                {selectedTracks.size > 0 && (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={playlistName}
+                      onChange={(e) => setPlaylistName(e.target.value)}
+                      placeholder="Playlist name"
+                      className="p-2 rounded bg-zinc-800 text-white border border-zinc-700 focus:outline-none focus:border-[#1DB954]"
                     />
-                  )}
-                  <div>
-                    <h3 className="font-bold text-xl">{track.name}</h3>
-                    <p className="text-zinc-400">{track.artists.map(a => a.name).join(', ')}</p>
-                    <p className="text-zinc-500 text-sm">Released: {new Date(track.album.release_date).getFullYear()}</p>
+                    <button
+                      onClick={createPlaylist}
+                      disabled={isCreatingPlaylist || selectedTracks.size === 0}
+                      className="bg-[#1DB954] text-black font-bold py-2 px-4 rounded hover:bg-opacity-90 transition duration-300 disabled:opacity-50"
+                    >
+                      {isCreatingPlaylist ? 'Creating...' : `Create Playlist (${selectedTracks.size})`}
+                    </button>
                   </div>
-                </div>
+                )}
               </div>
-            ))}
-          </div>
+              
+              {playlistResult && (
+                <div className="mb-4 p-4 bg-green-900 bg-opacity-20 border border-green-800 rounded-lg">
+                  <p className="font-bold text-green-400">
+                    Playlist "{playlistResult.name}" created successfully!
+                  </p>
+                  <a 
+                    href={playlistResult.external_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[#1DB954] hover:underline"
+                  >
+                    Open in Spotify
+                  </a>
+                  <button 
+                    onClick={() => setPlaylistResult(null)} 
+                    className="ml-4 text-sm text-zinc-400 hover:text-white"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+              
+              <div className="w-full space-y-4">
+                {searchResults.map((track) => (
+                  <div 
+                    key={track.id} 
+                    className={`bg-zinc-800 p-4 rounded-lg border ${
+                      selectedTracks.has(track.id) ? 'border-[#1DB954]' : 'border-zinc-700'
+                    } hover:border-zinc-500 transition duration-300`}
+                  >
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedTracks.has(track.id)}
+                        onChange={() => toggleTrackSelection(track.id)}
+                        className="w-5 h-5 mr-4 accent-[#1DB954]"
+                      />
+                      {track.album.images[0] && (
+                        <img 
+                          src={track.album.images[0].url} 
+                          alt={track.album.name}
+                          className="w-16 h-16 rounded-md mr-4"
+                        />
+                      )}
+                      <div>
+                        <h3 className="font-bold text-xl">{track.name}</h3>
+                        <p className="text-zinc-400">{track.artists.map(a => a.name).join(', ')}</p>
+                        <p className="text-zinc-500 text-sm">Released: {new Date(track.album.release_date).getFullYear()}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           
           <button 
             onClick={() => signOut()} 
