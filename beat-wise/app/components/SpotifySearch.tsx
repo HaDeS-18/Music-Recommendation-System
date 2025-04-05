@@ -4,7 +4,6 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { SearchResult } from "@/types/spotify";
 import { WelcomeHero } from "./WelcomeHero";
-import { SearchBar } from "./SearchBar";
 import { Features } from "./Features";
 
 type Recommendation = {
