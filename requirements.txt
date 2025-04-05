@@ -5,3 +5,5 @@ matplotlib
 scikit-learn    
 plotly
 scipy
+ipykernel
+spotipy
