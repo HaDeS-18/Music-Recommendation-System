@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
+
+  const backendURL = process.env.RECOMMENDER_API_URL || "http://localhost:8000"
   try {
     const body = await req.json();
     const { songs } = body;
@@ -10,7 +12,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "No songs provided" }, { status: 400 });
     }
 
-    const response = await fetch("http://localhost:8000/recommend", {
+    const response = await fetch(`${backendURL}/recommend`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ songs }),
