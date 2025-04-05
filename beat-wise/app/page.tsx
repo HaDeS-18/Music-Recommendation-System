@@ -1,9 +1,9 @@
-import Image from "next/image";
+import SpotifySearch from "./components/SpotifySearch";
 
 export default function Home() {
   return (
-    <div className="">
-      HELLO
-    </div>
+    <main className="min-h-screen flex flex-col items-center justify-center p-4">
+      <SpotifySearch />
+    </main>
   );
 }

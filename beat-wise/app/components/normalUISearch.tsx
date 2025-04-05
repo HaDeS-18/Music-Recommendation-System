@@ -4,7 +4,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useState } from "react";
 import { SearchResult } from "@/types/spotify";
 
-export default function SpotifySearch() {
+export default function NormalUISearch() {
   const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
