@@ -61,6 +61,7 @@ export default function SpotifySearch() {
         const searchRes = await fetch(
           `/api/spotify/search?q=${encodeURIComponent(song)}`
         );
+        
         const searchData = await searchRes.json();
         const track = searchData.tracks.items[0];
         if (track) {
