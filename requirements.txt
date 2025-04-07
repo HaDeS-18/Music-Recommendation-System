@@ -7,3 +7,5 @@ plotly
 scipy
 ipykernel
 spotipy
+fastapi
+uvicorn[standard]
