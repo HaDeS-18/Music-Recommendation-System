@@ -117,7 +117,7 @@ export default function SpotifySearch() {
   return (
     <div className="min-h-screen w-full bg-black text-white font-inter">
       {!session ? (
-        <div className="flex flex-col items-center justify-center pt-1 pb-24">
+        <div className="flex flex-col items-center justify-center pt-10 pb-24">
           <WelcomeHero />
           <button
             onClick={() => signIn("spotify")}
@@ -128,8 +128,19 @@ export default function SpotifySearch() {
           <Features />
         </div>
       ) : (
-        <div className="px-4 py-12 max-w-4xl mx-auto">
+        <div className="px-4 pb-12 max-w-4xl mx-auto">
           <WelcomeHero />
+          <div className="flex justify-center mb-6">
+            <a
+              href="/history"
+              className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-full transition duration-300 font-semibold text-sm flex items-center gap-2"
+            >
+              <span>View History</span>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </a>
+          </div>
 
           <div className="bg-zinc-900 p-5 rounded-2xl mb-12 max-w-md mx-auto shadow-xl border border-zinc-800">
             <h2 className="text-lg font-semibold text-center text-white mb-4 tracking-wide">

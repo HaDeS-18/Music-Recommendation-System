@@ -11,7 +11,7 @@ const features = [
   },
   {
     title: "Personalized Experience",
-    description: "Create an account to save your favorites and get better suggestions",
+    description: "Create an account to save your recommendations into a playlist",
     delay: 0.4,
   },
   {
