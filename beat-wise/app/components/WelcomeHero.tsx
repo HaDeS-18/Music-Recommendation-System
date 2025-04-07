@@ -9,7 +9,7 @@ export function WelcomeHero() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="text-center mb-12"
+      className="text-center mb-5"
     >
       <motion.div
         initial={{ scale: 0.9 }}
