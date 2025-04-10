@@ -2,20 +2,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Load the scaled dataset
 data_scaled_df = pd.read_csv("scaled_dataset.csv")
 
-# Normalize song name column
 data_scaled_df['name_lower'] = data_scaled_df['name'].str.lower()
 
 def get_song_features(song_name):
     song_name = song_name.strip().lower()
     matches = data_scaled_df[data_scaled_df['name_lower'] == song_name]
     if matches.empty:
-        print(f"❌ Song '{song_name}' not found.")
+        print(f"Song '{song_name}' not found.")
         return None
     latest_song = matches.sort_values(by='year', ascending=False).iloc[0]
-    print(f"✅ Found: {latest_song['name']} ({latest_song['year']}) by {latest_song['artists']}")
+    print(f"Found: {latest_song['name']} ({latest_song['year']}) by {latest_song['artists']}")
     return latest_song
 
 def plot_song_feature_comparison(song_name):

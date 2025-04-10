@@ -2,9 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Load the dataset
-data_scaled_df = pd.read_csv("scaled_dataset.csv")  # Make sure this file is in the same directory
-data_scaled_df['name_lower'] = data_scaled_df['name'].str.lower()  # Add lowercase column once for matching
+data_scaled_df = pd.read_csv("scaled_dataset.csv")
+data_scaled_df['name_lower'] = data_scaled_df['name'].str.lower()
 
 def get_song_data(song_name: str):
     """
@@ -14,10 +13,10 @@ def get_song_data(song_name: str):
     matches = data_scaled_df[data_scaled_df['name_lower'] == song_name]
     if not matches.empty:
         latest_song = matches.sort_values(by='year', ascending=False).iloc[0]
-        print(f"✅ Found: {latest_song['name']} ({latest_song['year']}) by {latest_song['artists']}")
+        print(f"Found: {latest_song['name']} ({latest_song['year']}) by {latest_song['artists']}")
         return latest_song
     else:
-        print(f"❌ Song '{song_name}' not found in the dataset.")
+        print(f"Song '{song_name}' not found in the dataset.")
         return None
 
 def recommend_songs(input_songs, num_recommendations=10):
@@ -28,7 +27,7 @@ def recommend_songs(input_songs, num_recommendations=10):
     input_songs_data = [s for s in input_songs_data if s is not None]
     
     if not input_songs_data:
-        print("⚠️ No valid input songs found.")
+        print("No valid input songs found.")
         return []
 
     input_features = pd.DataFrame(input_songs_data)[['danceability', 'energy', 'key', 'loudness',
@@ -58,7 +57,6 @@ def recommend_songs(input_songs, num_recommendations=10):
     
     return recommended_songs[['name', 'artists', 'year', 'similarity_score']]
 
-# Example usage
 if __name__ == "__main__":
     input_songs = ['90210', 'Blinding Lights', 'Shape of You']
     recommend_songs(input_songs)
