@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 
 music_rev_env2/
+music_rec_env3/
