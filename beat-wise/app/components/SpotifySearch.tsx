@@ -15,7 +15,6 @@ type Recommendation = {
 
 export default function SpotifySearch() {
   const { data: session } = useSession();
-  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
